@@ -22,6 +22,8 @@
 
 #include "DVDDemux.h"
 #include <map>
+#include "DllAvCodec.h"
+#include "DllAvFormat.h"
 
 #ifndef _LINUX
 #include <libavformat/avformat.h>
@@ -101,8 +103,13 @@ protected:
 #endif
   CDemuxStream* m_streams[MAX_STREAMS]; // maximum number of streams that ffmpeg can handle
 
+  DllAvCodec  m_dllAvCodec;
+  AVCodecParserContext* m_pParser;
+  bool m_bNeedExtraData;
+
 private:
   void RequestStreams();
   void UpdateStreams(PVR_STREAM_PROPERTIES *props);
+  bool ParseVideoPacket(DemuxPacket* pPacket);
 };
 
