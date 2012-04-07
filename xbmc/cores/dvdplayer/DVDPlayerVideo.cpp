@@ -1093,6 +1093,9 @@ int CDVDPlayerVideo::OutputPicture(const DVDVideoPicture* src, double pts)
       case RENDER_FMT_VDPAU:
         formatstr = "VDPAU";
         break;
+      case RENDER_FMT_VDPAU_420:
+        formatstr = "VDPAU_420";
+        break;
       case RENDER_FMT_DXVA:
         formatstr = "DXVA";
         break;
