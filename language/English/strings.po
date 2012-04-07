@@ -4826,7 +4826,15 @@ msgctxt "#13432"
 msgid "Allow hardware acceleration (VideoToolbox)"
 msgstr ""
 
-#empty strings from id 13433 to 13499
+msgctxt "#13433"
+msgid "Allow Vdpau OpenGL interop"
+msgstr ""
+
+msgctxt "#13434"
+msgid "Allow Vdpau OpenGL interop YUV"
+msgstr ""
+
+#empty strings from id 13435 to 13499
 
 msgctxt "#13500"
 msgid "A/V sync method"
@@ -6014,7 +6022,11 @@ msgctxt "#16324"
 msgid "Software Blend"
 msgstr ""
 
-#empty strings from id 16325 to 16399
+msgctxt "#16325"
+msgid "VDPAU Bob"
+msgstr ""
+
+#empty strings from id 16326 to 16399
 
 msgctxt "#16400"
 msgid "Post-processing"
