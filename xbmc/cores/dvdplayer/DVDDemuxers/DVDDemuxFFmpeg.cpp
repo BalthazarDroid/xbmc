@@ -596,10 +596,17 @@ void CDVDDemuxFFmpeg::SetSpeed(int iSpeed)
   }
 }
 
-double CDVDDemuxFFmpeg::ConvertTimestamp(int64_t pts, int den, int num)
+double CDVDDemuxFFmpeg::ConvertTimestamp(int64_t pts, int den, int num, int streamIdx /*= -1*/)
 {
   if (pts == (int64_t)AV_NOPTS_VALUE)
     return DVD_NOPTS_VALUE;
+
+  if (streamIdx >= 0)
+  {
+    if (m_pFormatContext->streams[streamIdx]->start_time != AV_NOPTS_VALUE &&
+        pts < m_pFormatContext->streams[streamIdx]->start_time)
+      pts += 1LL<<m_pFormatContext->streams[streamIdx]->pts_wrap_bits;
+  }
 
   // do calculations in floats as they can easily overflow otherwise
   // we don't care for having a completly exact timestamp anyway
@@ -732,8 +739,8 @@ DemuxPacket* CDVDDemuxFFmpeg::Read()
         if (pkt.data)
           memcpy(pPacket->pData, pkt.data, pPacket->iSize);
 
-        pPacket->pts = ConvertTimestamp(pkt.pts, stream->time_base.den, stream->time_base.num);
-        pPacket->dts = ConvertTimestamp(pkt.dts, stream->time_base.den, stream->time_base.num);
+        pPacket->pts = ConvertTimestamp(pkt.pts, stream->time_base.den, stream->time_base.num, pkt.stream_index);
+        pPacket->dts = ConvertTimestamp(pkt.dts, stream->time_base.den, stream->time_base.num, pkt.stream_index);
         pPacket->duration =  DVD_SEC_TO_TIME((double)pkt.duration * stream->time_base.num / stream->time_base.den);
 
         // used to guess streamlength
@@ -884,7 +891,7 @@ void CDVDDemuxFFmpeg::UpdateCurrentPTS()
     AVStream *stream = m_pFormatContext->streams[i];
     if(stream && stream->cur_dts != (int64_t)AV_NOPTS_VALUE)
     {
-      double ts = ConvertTimestamp(stream->cur_dts, stream->time_base.den, stream->time_base.num);
+      double ts = ConvertTimestamp(stream->cur_dts, stream->time_base.den, stream->time_base.num, i);
       if(m_iCurrentPts == DVD_NOPTS_VALUE || m_iCurrentPts > ts )
         m_iCurrentPts = ts;
     }

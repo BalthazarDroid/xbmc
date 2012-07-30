@@ -121,7 +121,7 @@ protected:
   int ReadFrame(AVPacket *packet);
   void AddStream(int iId);
 
-  double ConvertTimestamp(int64_t pts, int den, int num);
+  double ConvertTimestamp(int64_t pts, int den, int num, int streamIdx = -1);
   void UpdateCurrentPTS();
 
   CCriticalSection m_critSection;
