@@ -1711,11 +1711,20 @@ int64_t ff_gen_search(AVFormatContext *s, int stream_index, int64_t target_ts,
         if (ts_max == AV_NOPTS_VALUE)
             return -1;
 
+        if ((s->streams[stream_index]->start_time != AV_NOPTS_VALUE) &&
+            (ts_max < s->streams[stream_index]->start_time)) {
+              ts_max += 1LL<<(s->streams[stream_index]->pts_wrap_bits);
+        }
+
         for(;;){
             int64_t tmp_pos= pos_max + 1;
             int64_t tmp_ts= read_timestamp(s, stream_index, &tmp_pos, INT64_MAX);
             if(tmp_ts == AV_NOPTS_VALUE)
                 break;
+            if ((s->streams[stream_index]->start_time != AV_NOPTS_VALUE) &&
+                (tmp_ts < s->streams[stream_index]->start_time)) {
+                  tmp_ts += 1LL<<(s->streams[stream_index]->pts_wrap_bits);
+            }
             ts_max= tmp_ts;
             pos_max= tmp_pos;
             if(tmp_pos >= filesize)
@@ -1772,6 +1781,11 @@ int64_t ff_gen_search(AVFormatContext *s, int stream_index, int64_t target_ts,
             av_log(s, AV_LOG_ERROR, "read_timestamp() failed in the middle\n");
             return -1;
         }
+        if ((s->streams[stream_index]->start_time != AV_NOPTS_VALUE) &&
+            (ts < s->streams[stream_index]->start_time)) {
+              ts += 1LL<<(s->streams[stream_index]->pts_wrap_bits);
+        }
+
         assert(ts != AV_NOPTS_VALUE);
         if (target_ts <= ts) {
             pos_limit = start_pos - 1;
